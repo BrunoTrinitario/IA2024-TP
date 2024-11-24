@@ -3,6 +3,8 @@ import os
 import numpy as np
 
 vec=[
+'Year',
+'T2M_1',
 'WD2M_1',
 'WS2M_1',
 'PS_1',
