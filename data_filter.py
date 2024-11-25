@@ -35,15 +35,16 @@ vec=[
 'ET0_1'
 ]
 
-def AgruparMatrizFinal(matriz):
-    anios_unicos = np.unique(matriz[:, 0])
-    resultados = []
-    for anio in anios_unicos:
-        filas_del_anio = matriz[matriz[:, 0] == anio]
-        promedio = filas_del_anio[:, 1:].mean(axis=0)
-        resultados.append(np.insert(promedio, 0, anio))
-    
-    return np.array(resultados)
+def AgruparMatrizFinal(matriz,grupos):
+    anios = np.unique(matriz[:, 0])  # La columna 0 contiene los años
+    filas_seleccionadas = []
+    for anio in anios:
+        filas_anio = matriz[matriz[:, 0] == anio]
+        seleccion = filas_anio[np.random.choice(filas_anio.shape[0], min(grupos, filas_anio.shape[0]), replace=False)]
+        filas_seleccionadas.append(seleccion)
+    matriz_resultado = np.vstack(filas_seleccionadas)
+
+    return np.array(matriz_resultado)
 
 def randomTestData(matriz):
     anios_unicos = np.unique(matriz[:, 0])
@@ -54,16 +55,30 @@ def randomTestData(matriz):
         resultados.append(fila_seleccionada)
     return np.array(resultados)
 
-matriz_general = np.empty((0, len(vec)))
-for i in range(1,12):
-    if (os.path.exists(f'./data/southamerica_{i}_regional_monthly.csv')):
-        df=pd.read_csv(f'./data/southamerica_{i}_regional_monthly.csv')
-        informacion=df[(df['lat']>=-41.08) & (df['lat']<=-33.04) & (df['lng']>=-63.37) & (df['lng']<=-55.82)]
-        informacion=informacion[vec]
-        if (informacion.shape[0]>0):
-            matriz_general = np.vstack([matriz_general, informacion.to_numpy()])
-random_mat= randomTestData(matriz_general)
-matriz_general=AgruparMatrizFinal(matriz_general)
-print(f'cantidad de datos finales: {matriz_general.shape[0]}')
-np.savetxt('./data/testData.csv', random_mat, delimiter=',', header=",".join(vec), comments='', fmt='%f')
-np.savetxt('./data/trainData.csv', matriz_general, delimiter=',', header=",".join(vec), comments='', fmt='%f')
+def generarTrainData(path='./data/trainData.csv'):
+    matriz_general = np.empty((0, len(vec)))
+    for i in range(1,12):
+        if (os.path.exists(f'./data/southamerica_{i}_regional_monthly.csv')):
+            df=pd.read_csv(f'./data/southamerica_{i}_regional_monthly.csv')
+            informacion=df[(df['Year']<=2005) & (df['lat']>=-41.08) & (df['lat']<=-33.04) & (df['lng']>=-63.37) & (df['lng']<=-55.82)]
+            informacion=informacion[vec]
+            if (informacion.shape[0]>0):
+                matriz_general = np.vstack([matriz_general, informacion.to_numpy()])
+    matriz_general=AgruparMatrizFinal(matriz_general,10)
+    print(f'cantidad de datos finales: {matriz_general.shape[0]}')
+    np.savetxt(path, matriz_general, delimiter=',', header=",".join(vec), comments='', fmt='%f')
+
+def generarTestData(path='./data/testData.csv'):
+    matriz_general = np.empty((0, len(vec)))
+    for i in range(1,12):
+        if (os.path.exists(f'./data/southamerica_{i}_regional_monthly.csv')):
+            df=pd.read_csv(f'./data/southamerica_{i}_regional_monthly.csv')
+            informacion=df[(df['Year']>=2005) & (df['lat']>=-41.08) & (df['lat']<=-33.04) & (df['lng']>=-63.37) & (df['lng']<=-55.82)]
+            informacion=informacion[vec]
+            if (informacion.shape[0]>0):
+                matriz_general = np.vstack([matriz_general, informacion.to_numpy()])
+    random_mat= randomTestData(matriz_general)
+    print(f'cantidad de datos finales: {random_mat.shape[0]}')
+    np.savetxt(path, random_mat, delimiter=',', header=",".join(vec), comments='', fmt='%f')
+
+generarTrainData()
