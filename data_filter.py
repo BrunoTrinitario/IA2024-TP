@@ -45,6 +45,14 @@ def AgruparMatrizFinal(matriz):
     
     return np.array(resultados)
 
+def randomTestData(matriz):
+    anios_unicos = np.unique(matriz[:, 0])
+    resultados = []
+    for anio in anios_unicos:
+        filas_del_anio = matriz[matriz[:, 0] == anio]
+        fila_seleccionada = filas_del_anio[np.random.choice(filas_del_anio.shape[0])]
+        resultados.append(fila_seleccionada)
+    return np.array(resultados)
 
 matriz_general = np.empty((0, len(vec)))
 for i in range(1,12):
@@ -54,6 +62,8 @@ for i in range(1,12):
         informacion=informacion[vec]
         if (informacion.shape[0]>0):
             matriz_general = np.vstack([matriz_general, informacion.to_numpy()])
+random_mat= randomTestData(matriz_general)
 matriz_general=AgruparMatrizFinal(matriz_general)
 print(f'cantidad de datos finales: {matriz_general.shape[0]}')
+np.savetxt('./data/testData.csv', random_mat, delimiter=',', header=",".join(vec), comments='', fmt='%f')
 np.savetxt('./data/trainData.csv', matriz_general, delimiter=',', header=",".join(vec), comments='', fmt='%f')
