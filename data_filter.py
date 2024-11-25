@@ -56,4 +56,4 @@ for i in range(1,12):
             matriz_general = np.vstack([matriz_general, informacion.to_numpy()])
 matriz_general=AgruparMatrizFinal(matriz_general)
 print(f'cantidad de datos finales: {matriz_general.shape[0]}')
-np.savetxt('./data/informacion_filtrada.csv', matriz_general, delimiter=',', header=",".join(vec), comments='', fmt='%f')
+np.savetxt('./data/trainData.csv', matriz_general, delimiter=',', header=",".join(vec), comments='', fmt='%f')
