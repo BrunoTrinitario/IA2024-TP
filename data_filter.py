@@ -60,25 +60,12 @@ def generarTrainData(path='./data/trainData.csv'):
     for i in range(1,12):
         if (os.path.exists(f'./data/southamerica_{i}_regional_monthly.csv')):
             df=pd.read_csv(f'./data/southamerica_{i}_regional_monthly.csv')
-            informacion=df[(df['Year']<=2005) & (df['lat']>=-41.08) & (df['lat']<=-33.04) & (df['lng']>=-63.37) & (df['lng']<=-55.82)]
+            informacion=df[(df['lat']>=-41.08) & (df['lat']<=-33.04) & (df['lng']>=-63.37) & (df['lng']<=-55.82)]
             informacion=informacion[vec]
             if (informacion.shape[0]>0):
                 matriz_general = np.vstack([matriz_general, informacion.to_numpy()])
     matriz_general=AgruparMatrizFinal(matriz_general,10)
     print(f'cantidad de datos finales: {matriz_general.shape[0]}')
     np.savetxt(path, matriz_general, delimiter=',', header=",".join(vec), comments='', fmt='%f')
-
-def generarTestData(path='./data/testData.csv'):
-    matriz_general = np.empty((0, len(vec)))
-    for i in range(1,12):
-        if (os.path.exists(f'./data/southamerica_{i}_regional_monthly.csv')):
-            df=pd.read_csv(f'./data/southamerica_{i}_regional_monthly.csv')
-            informacion=df[(df['Year']>=2005) & (df['lat']>=-41.08) & (df['lat']<=-33.04) & (df['lng']>=-63.37) & (df['lng']<=-55.82)]
-            informacion=informacion[vec]
-            if (informacion.shape[0]>0):
-                matriz_general = np.vstack([matriz_general, informacion.to_numpy()])
-    random_mat= randomTestData(matriz_general)
-    print(f'cantidad de datos finales: {random_mat.shape[0]}')
-    np.savetxt(path, random_mat, delimiter=',', header=",".join(vec), comments='', fmt='%f')
 
 generarTrainData()
